@@ -1,1 +1,0 @@
-UPDATE Config SET `value` = `value` || ' hours' WHERE name = "maxExpiration" OR name = "sessionDuration";

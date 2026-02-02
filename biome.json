@@ -1,0 +1,101 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.3.13/schema.json",
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "nursery": {
+        "useMaxParams": "error",
+        "useExplicitType": "error",
+        "useConsistentArrowReturn": "error",
+        "useAwaitThenable": "off",
+        "useArraySortCompare": "error",
+        "noUselessUndefined": "error",
+        "noUselessCatchBinding": "error",
+        "noUnusedExpressions": "error",
+        "noUnresolvedImports": "off",
+        "noUnnecessaryConditions": "error",
+        "noShadow": "error",
+        "noReactForwardRef": "error",
+        "noParametersOnlyUsedInRecursion": "error",
+        "noMisusedPromises": "error",
+        "noLeakedRender": "error",
+        "noImportCycles": "error",
+        "noFloatingPromises": "error"
+      },
+      "complexity": {
+        "useLiteralKeys": "off",
+        "useSimplifiedLogicExpression": "error",
+        "noUselessStringConcat": "error",
+        "noImplicitCoercions": "error",
+        "noForEach": "error"
+      },
+      "correctness": {
+        "noUndeclaredVariables": "error",
+        "noReactPropAssignments": "error",
+        "noProcessGlobal": "error",
+        "noNestedComponentDefinitions": "error"
+      },
+      "style": {
+        "noNonNullAssertion": "error"
+      },
+      "performance": {
+        "noNamespaceImport": "error",
+        "noReExportAll": "error",
+        "noBarrelFile": "error"
+      },
+      "suspicious": {
+        "noConsole": "error",
+        "noExplicitAny": "error",
+        "noDoubleEquals": "error",
+        "noImplicitAnyLet": "error",
+        "noConfusingVoidType": "error",
+        "noDebugger": "error",
+        "noTsIgnore": "error",
+        "useErrorMessage": "error",
+        "noVar": "error",
+        "noUnassignedVariables": "error",
+        "noMisplacedAssertion": "error",
+        "noEvolvingTypes": "error"
+      }
+    }
+  },
+  "assist": {
+    "enabled": true
+  },
+  "javascript": {
+    "globals": ["Bun"]
+  },
+  "css": {
+    "parser": {
+      "cssModules": true
+    }
+  },
+  "files": {
+    "includes": [
+      "src/**",
+      "*.ts",
+      "*.json",
+      "!dist",
+      "!node_modules",
+      "!data",
+      "!.claude"
+    ]
+  },
+  "overrides": [
+    {
+      "includes": ["src/server/**"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off"
+          }
+        }
+      }
+    }
+  ]
+}

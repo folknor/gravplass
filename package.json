@@ -1,19 +1,29 @@
 {
-  "name": "ottrbox",
-  "version": "1.15.0",
+  "name": "gravplass",
+  "version": "1.0.0",
+  "type": "module",
   "scripts": {
-    "format": "cd frontend && npm run format && cd ../backend && npm run format",
-    "lint": "cd frontend && npm run lint && cd ../backend && npm run lint",
-    "version": "conventional-changelog -p conventionalcommits -i CHANGELOG.md -s && git add CHANGELOG.md",
-    "release:patch": "cd backend && npm version patch --commit-hooks false && cd ../frontend && npm version patch --commit-hooks false && cd .. && git add . && npm version patch --force -m 'release: %s' && git push && git push --tags",
-    "release:minor": "cd backend && npm version minor --commit-hooks false && cd ../frontend && npm version minor --commit-hooks false && cd .. && git add . && npm version minor --force -m 'release: %s' && git push && git push --tags",
-    "deploy:dev": "docker buildx build --push --tag aottr/ottrbox:development --platform linux/amd64,linux/arm64 ."
+    "dev": "bun --watch src/server/index.ts",
+    "build": "vite build",
+    "start": "bun src/server/index.ts",
+    "check": "pnpm exec biome check --write --max-diagnostics=none --reporter=github --formatter-enabled=true --linter-enabled=true --assist-enabled=true"
+  },
+  "dependencies": {
+    "@mantine/core": "^7.17.8",
+    "@mantine/dropzone": "^7.17.8",
+    "@mantine/hooks": "^7.17.8",
+    "nanoid": "^5.1.6",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "toml": "^3.0.0"
   },
   "devDependencies": {
-    "conventional-changelog-cli": "^3.0.0"
-  },
-  "prettier": {
-    "singleQuote": false,
-    "trailingComma": "all"
+    "@biomejs/biome": "^2.3.13",
+    "@types/bun": "^1.3.8",
+    "@types/react": "^18.3.27",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "typescript": "^5.9.3",
+    "vite": "^6.4.1"
   }
 }
