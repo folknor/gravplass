@@ -1,3 +1,7 @@
 port = 3000
 data_dir = "./data"
+max_file_size_mb = 512
+share_ttl_days = 3
+max_bucket_size_mb = 2048
+
 passwords = ["changeme1", "changeme2", "changeme3"]
