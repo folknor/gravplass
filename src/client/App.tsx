@@ -106,7 +106,7 @@ export default function App(): ReactElement {
   const totalSize = queuedFiles.reduce((sum, f) => sum + f.size, 0);
   const exceedsQuota = quota !== null && totalSize > quota.available;
 
-  // Fetch quota when password changes or after upload
+  // Fetch quota when password changes or after upload (debounced)
   useEffect(() => {
     if (!password) {
       setQuota(null);
@@ -117,27 +117,32 @@ export default function App(): ReactElement {
     void quotaRefresh;
 
     const controller = new AbortController();
-    fetch("/api/quota", {
-      headers: { "X-Password": password },
-      signal: controller.signal,
-    })
-      .then((res) => {
-        if (res.ok) {
-          return res.json() as Promise<Quota>;
-        }
-        setQuota(null);
-        return null;
+
+    // Debounce: wait 500ms after user stops typing
+    const timeoutId = setTimeout(() => {
+      fetch("/api/quota", {
+        headers: { "X-Password": password },
+        signal: controller.signal,
       })
-      .then((data) => {
-        if (data) {
-          setQuota(data);
-        }
-      })
-      .catch(() => {
-        // Ignore abort errors
-      });
+        .then((res) => {
+          if (res.ok) {
+            return res.json() as Promise<Quota>;
+          }
+          setQuota(null);
+          return null;
+        })
+        .then((data) => {
+          if (data) {
+            setQuota(data);
+          }
+        })
+        .catch(() => {
+          // Ignore abort errors
+        });
+    }, 500);
 
     return (): void => {
+      clearTimeout(timeoutId);
       controller.abort();
     };
   }, [password, quotaRefresh]);

@@ -7,7 +7,7 @@ import { config } from "./config";
 const DIST_DIR = "./dist/client";
 const HOUR_MS: number = 60 * 60 * 1000;
 const RATE_LIMIT_WINDOW: number = 60 * 1000; // 1 minute
-const RATE_LIMIT_MAX: number = 10; // 10 requests per minute
+const RATE_LIMIT_MAX: number = 30; // 30 requests per minute
 
 const rateLimitMap: Map<string, { count: number; resetAt: number }> = new Map();
 
