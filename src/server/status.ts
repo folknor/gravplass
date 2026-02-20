@@ -1,6 +1,10 @@
+import { readFileSync } from "node:fs";
 import { readdir, stat } from "node:fs/promises";
 import { join } from "node:path";
-import { config } from "./config";
+import { parse } from "toml";
+
+const configPath = process.env["CONFIG_PATH"] ?? "./config.toml";
+const config = parse(readFileSync(configPath, "utf-8")) as { data_dir: string };
 
 async function getDirSize(dirPath: string): Promise<number> {
   let total = 0;
