@@ -47,3 +47,4 @@ try {
 const totalSize = await getDirSize(uploadsDir);
 
 console.log(`shares: ${String(shares)} across ${String(buckets)} bucket${buckets === 1 ? "" : "s"}, ${formatBytes(totalSize)} on disk`);
+process.exit(0);
