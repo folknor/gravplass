@@ -1,4 +1,6 @@
+import { watchFile } from "node:fs";
 import { mkdir, readdir, rm, stat } from "node:fs/promises";
+import { homedir } from "node:os";
 import { join } from "node:path";
 import Archiver from "archiver";
 import { nanoid } from "nanoid";
@@ -306,3 +308,13 @@ const server: ReturnType<typeof Bun.serve> = Bun.serve({
 });
 
 console.log(`Server running at http://localhost:${String(server.port)}`);
+
+// Watch for deploy restart signal
+const restartFlag = join(homedir(), ".restart-requested");
+watchFile(restartFlag, { interval: 5000 }, (curr, prev) => {
+  if (curr.ino !== 0 && prev.ino === 0) {
+    console.log("Restart requested, shutting down...");
+    server.stop();
+    process.exit(0);
+  }
+});
