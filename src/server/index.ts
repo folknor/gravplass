@@ -311,8 +311,8 @@ console.log(`Server running at http://localhost:${String(server.port)}`);
 
 // Watch for deploy restart signal
 const restartFlag = join(homedir(), ".restart-requested");
-watchFile(restartFlag, { interval: 5000 }, (curr, prev) => {
-  if (curr.ino !== 0 && prev.ino === 0) {
+watchFile(restartFlag, { interval: 5000 }, (curr) => {
+  if (curr.mtimeMs > 0) {
     console.log("Restart requested, shutting down...");
     server.stop();
     process.exit(0);
