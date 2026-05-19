@@ -1,9 +1,10 @@
 import { readFileSync } from "node:fs";
 import { readdir, stat } from "node:fs/promises";
 import { join } from "node:path";
+import process from "node:process";
 import { parse } from "toml";
 
-const configPath = process.env["CONFIG_PATH"] ?? "./config.toml";
+const configPath: string = process.env["CONFIG_PATH"] ?? "./config.toml";
 const config = parse(readFileSync(configPath, "utf-8")) as { data_dir: string };
 
 async function getDirSize(dirPath: string): Promise<number> {
@@ -28,7 +29,8 @@ async function getDirSize(dirPath: string): Promise<number> {
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${String(bytes)}B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)}KB`;
-  if (bytes < 1024 * 1024 * 1024) return `${(bytes / 1024 / 1024).toFixed(1)}MB`;
+  if (bytes < 1024 * 1024 * 1024)
+    return `${(bytes / 1024 / 1024).toFixed(1)}MB`;
   return `${(bytes / 1024 / 1024 / 1024).toFixed(1)}GB`;
 }
 
@@ -48,7 +50,9 @@ try {
   // No uploads yet
 }
 
-const totalSize = await getDirSize(uploadsDir);
+const totalSize: number = await getDirSize(uploadsDir);
 
-console.log(`shares: ${String(shares)} across ${String(buckets)} bucket${buckets === 1 ? "" : "s"}, ${formatBytes(totalSize)} on disk`);
+console.log(
+  `shares: ${String(shares)} across ${String(buckets)} bucket${buckets === 1 ? "" : "s"}, ${formatBytes(totalSize)} on disk`,
+);
 process.exit(0);

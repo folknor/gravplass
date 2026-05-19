@@ -1,31 +1,31 @@
 {
-  "name": "gravplass",
-  "version": "1.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "bun --watch src/server/index.ts",
-    "build": "vite build",
-    "start": "bun src/server/index.ts",
-    "check": "pnpm exec biome check --write --max-diagnostics=none --reporter=github --formatter-enabled=true --linter-enabled=true --assist-enabled=true"
-  },
   "dependencies": {
-    "@mantine/core": "^8.3.16",
-    "@mantine/dropzone": "^8.3.16",
-    "@mantine/hooks": "^8.3.16",
-    "archiver": "^7.0.1",
-    "nanoid": "^5.1.6",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "toml": "^3.0.0"
+    "@mantine/core": "^9.2.1",
+    "@mantine/dropzone": "^9.2.1",
+    "@mantine/hooks": "^9.2.1",
+    "archiver": "^8.0.0",
+    "nanoid": "^5.1.11",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "toml": "^4.1.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.6",
+    "@biomejs/biome": "^2.4.15",
     "@types/archiver": "^7.0.0",
-    "@types/bun": "^1.3.10",
+    "@types/bun": "^1.3.14",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^6.0.0",
-    "typescript": "^5.9.3",
-    "vite": "^8.0.0"
-  }
+    "@vitejs/plugin-react": "^6.0.2",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.13"
+  },
+  "name": "gravplass",
+  "scripts": {
+    "build": "vite build",
+    "check": "pnpm exec biome check --write --max-diagnostics=none --reporter=github --formatter-enabled=true --linter-enabled=true --assist-enabled=true",
+    "dev": "bun --watch src/server/index.ts",
+    "start": "bun src/server/index.ts"
+  },
+  "type": "module",
+  "version": "1.0.0"
 }

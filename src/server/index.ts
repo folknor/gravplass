@@ -2,6 +2,7 @@ import { watchFile } from "node:fs";
 import { mkdir, readdir, rm, stat } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
+import process from "node:process";
 import Archiver from "archiver";
 import { nanoid } from "nanoid";
 import { config } from "./config";
