@@ -3,7 +3,7 @@ import { mkdir, readdir, rm, stat } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import process from "node:process";
-import Archiver from "archiver";
+import { ZipArchive } from "archiver";
 import { nanoid } from "nanoid";
 import { config } from "./config";
 
@@ -152,7 +152,7 @@ async function handleDownload(pathname: string): Promise<Response> {
       });
     } else {
       // Multiple files - serve as zip
-      const archive = Archiver("zip", { zlib: { level: 5 } });
+      const archive = new ZipArchive({ zlib: { level: 5 } });
       for (const filename of files) {
         archive.file(join(shareDir, filename), { name: filename });
       }
