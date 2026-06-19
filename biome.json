@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.4.16/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.0/schema.json",
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
@@ -11,12 +11,7 @@
       "nursery": {
         "useExplicitType": "error",
         "useAwaitThenable": "off",
-        "useArraySortCompare": "error",
-        "noUnnecessaryConditions": "error",
-        "noShadow": "error",
-        "noParametersOnlyUsedInRecursion": "error",
         "noMisusedPromises": "error",
-        "noLeakedRender": "error",
         "noFloatingPromises": "error"
       },
       "complexity": {
@@ -60,7 +55,12 @@
         "noEvolvingTypes": "error",
         "noUnusedExpressions": "error",
         "noReactForwardRef": "error",
-        "noImportCycles": "error"
+        "noImportCycles": "error",
+        "useArraySortCompare": "error",
+        "noUnnecessaryConditions": "error",
+        "noShadow": "error",
+        "noParametersOnlyUsedInRecursion": "error",
+        "noLeakedRender": "error"
       }
     }
   },
