@@ -5,3 +5,8 @@ data
 *.log
 .env
 config.toml
+.claude
+.agents
+.codex
+.brokkr
+.plans
