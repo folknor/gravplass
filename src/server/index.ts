@@ -156,7 +156,10 @@ async function handleDownload(pathname: string): Promise<Response> {
       for (const filename of files) {
         archive.file(join(shareDir, filename), { name: filename });
       }
-      archive.finalize();
+      // Not awaited: the archive only drains once the Response consumes it
+      archive.finalize().catch((err: unknown) => {
+        console.error(`Failed to build zip for share ${shareId}:`, err);
+      });
 
       response = new Response(archive as unknown as BodyInit, {
         headers: {
