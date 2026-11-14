@@ -9,15 +9,8 @@ export default defineConfig({
   globals: {
     Bun: "readonly",
   },
-  ignorePatterns: [
-    "**/dist/**",
-    "data/**",
-    ".claude/**",
-    "tools/oxlint/anti-slop/**",
-  ],
-  jsPlugins: [
-    { name: "anti-slop", specifier: "./tools/oxlint/anti-slop/index.ts" },
-  ],
+  ignorePatterns: ["**/dist/**", "data/**", ".claude/**", "tools/oxlint/anti-slop/**"],
+  jsPlugins: [{ name: "anti-slop", specifier: "./tools/oxlint/anti-slop/index.ts" }],
   rules: {
     "oxc/no-accumulating-spread": "error",
     // The automatic JSX runtime needs no React import, and CSS is imported

@@ -17,15 +17,7 @@ import {
 import { Dropzone } from "@mantine/dropzone";
 import type { ChangeEvent, ReactElement } from "react";
 import { useCallback, useEffect, useState } from "react";
-import {
-  IconCheck,
-  IconCopy,
-  IconFile,
-  IconLink,
-  IconTrash,
-  IconUpload,
-  IconX,
-} from "./icons";
+import { IconCheck, IconCopy, IconFile, IconLink, IconTrash, IconUpload, IconX } from "./icons";
 
 interface UploadResult {
   url: string;
@@ -164,23 +156,17 @@ export default function App(): ReactElement {
     setQueuedFiles([]);
   }, []);
 
-  const handlePasswordChange = useCallback(
-    (e: ChangeEvent<HTMLInputElement>): void => {
-      setPassword(e.currentTarget.value);
-    },
-    [],
-  );
+  const handlePasswordChange = useCallback((e: ChangeEvent<HTMLInputElement>): void => {
+    setPassword(e.currentTarget.value);
+  }, []);
 
   const handleCloseError = useCallback((): void => {
     setError(null);
   }, []);
 
-  const handleBurnChange = useCallback(
-    (e: ChangeEvent<HTMLInputElement>): void => {
-      setBurn(e.currentTarget.checked);
-    },
-    [],
-  );
+  const handleBurnChange = useCallback((e: ChangeEvent<HTMLInputElement>): void => {
+    setBurn(e.currentTarget.checked);
+  }, []);
 
   const handleUpload = useCallback(async (): Promise<void> => {
     if (!password) {
@@ -200,14 +186,9 @@ export default function App(): ReactElement {
     setProgress({ loaded: 0, total: totalSize });
 
     try {
-      const result = await uploadFiles(
-        queuedFiles,
-        password,
-        burn,
-        (loaded, total) => {
-          setProgress({ loaded, total });
-        },
-      );
+      const result = await uploadFiles(queuedFiles, password, burn, (loaded, total) => {
+        setProgress({ loaded, total });
+      });
 
       setResults((prev) => [
         {
@@ -228,8 +209,7 @@ export default function App(): ReactElement {
     }
   }, [password, queuedFiles, burn, totalSize]);
 
-  const progressPercent =
-    progress.total > 0 ? (progress.loaded / progress.total) * 100 : 0;
+  const progressPercent = progress.total > 0 ? (progress.loaded / progress.total) * 100 : 0;
 
   return (
     <Container size="sm" py="xl">
@@ -255,11 +235,7 @@ export default function App(): ReactElement {
         {quota === null ? null : (
           <>
             <Dropzone onDrop={handleDrop} disabled={uploading} multiple>
-              <Group
-                justify="center"
-                gap="xl"
-                style={{ minHeight: 120, pointerEvents: "none" }}
-              >
+              <Group justify="center" gap="xl" style={{ minHeight: 120, pointerEvents: "none" }}>
                 <Dropzone.Accept>
                   <IconUpload size={50} stroke={1.5} />
                 </Dropzone.Accept>
@@ -285,8 +261,8 @@ export default function App(): ReactElement {
               <Paper withBorder p="md">
                 <Group justify="space-between" mb="sm">
                   <Title order={4}>
-                    {queuedFiles.length} fil{queuedFiles.length > 1 ? "er" : ""}{" "}
-                    ({formatBytes(totalSize)})
+                    {queuedFiles.length} fil{queuedFiles.length > 1 ? "er" : ""} (
+                    {formatBytes(totalSize)})
                   </Title>
                   <Button
                     variant="subtle"
@@ -345,8 +321,7 @@ export default function App(): ReactElement {
 
             {exceedsQuota ? (
               <Alert color="orange">
-                Filene overskrider tilgjengelig plass (
-                {formatBytes(quota?.available ?? 0)} ledig)
+                Filene overskrider tilgjengelig plass ({formatBytes(quota?.available ?? 0)} ledig)
               </Alert>
             ) : null}
 
@@ -390,11 +365,7 @@ export default function App(): ReactElement {
                               variant="subtle"
                               onClick={copy}
                             >
-                              {copied ? (
-                                <IconCheck size={16} />
-                              ) : (
-                                <IconCopy size={16} />
-                              )}
+                              {copied ? <IconCheck size={16} /> : <IconCopy size={16} />}
                             </ActionIcon>
                           </Tooltip>
                         )}

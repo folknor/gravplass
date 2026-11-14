@@ -4,7 +4,6 @@ Minimal file sharing. Upload files, get links.
 
 Built with LLMs. See [LLM.md](LLM.md).
 
-
 ## Setup
 
 1. Install [Bun](https://bun.sh)
