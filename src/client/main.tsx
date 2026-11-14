@@ -12,6 +12,7 @@ const theme: MantineThemeOverride = createTheme({
 });
 
 const rootElement: HTMLElement | null = document.getElementById("root");
+
 if (!rootElement) {
   throw new Error("Root element not found");
 }

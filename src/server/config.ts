@@ -15,6 +15,7 @@ const configPath: string = process.env["CONFIG_PATH"] ?? "./config.toml";
 
 function loadConfig(): Config {
   const content = readFileSync(configPath, "utf-8");
+
   return parse(content) as Config;
 }
 

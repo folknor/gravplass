@@ -39,6 +39,7 @@ function formatBytes(bytes: number): string {
   const sizes = ["B", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   const size = sizes[i] ?? "GB";
+
   return `${(bytes / k ** i).toFixed(1)} ${size}`;
 }
 
@@ -110,6 +111,7 @@ export default function App(): ReactElement {
   useEffect(() => {
     if (!password) {
       setQuota(null);
+
       return;
     }
 
@@ -128,7 +130,9 @@ export default function App(): ReactElement {
           if (res.ok) {
             return res.json() as Promise<Quota>;
           }
+
           setQuota(null);
+
           return null;
         })
         .then((data) => {
@@ -181,10 +185,13 @@ export default function App(): ReactElement {
   const handleUpload = useCallback(async (): Promise<void> => {
     if (!password) {
       setError("Vennligst skriv inn et passord");
+
       return;
     }
+
     if (queuedFiles.length === 0) {
       setError("Ingen filer å laste opp");
+
       return;
     }
 

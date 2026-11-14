@@ -10,20 +10,21 @@
     "toml": "^5.0.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.6.4",
+    "@oxlint/plugins": "1.93.0",
     "@types/archiver": "^8.0.0",
     "@types/bun": "^1.4.4",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
+    "oxlint": "1.93.0",
     "typescript": "^7.0.2",
     "vite": "^8.3.5"
   },
   "name": "gravplass",
   "scripts": {
     "build": "vite build",
-    "check": "pnpm exec biome check --write --max-diagnostics=none --reporter=github --formatter-enabled=true --linter-enabled=true --assist-enabled=true",
     "dev": "bun --watch src/server/index.ts",
+    "lint": "oxlint",
     "start": "bun src/server/index.ts"
   },
   "type": "module",

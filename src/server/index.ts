@@ -20,10 +20,12 @@ function isRateLimited(ip: string): boolean {
 
   if (!entry || now > entry.resetAt) {
     rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
+
     return false;
   }
 
   entry.count += 1;
+
   return entry.count > RATE_LIMIT_MAX;
 }
 
@@ -37,15 +39,19 @@ function getClientIp(req: Request): string {
 
 function hashPassword(password: string): string {
   const hash = Bun.hash(password);
+
   return hash.toString(16).slice(0, 12);
 }
 
 async function getDirSize(dirPath: string): Promise<number> {
   let total = 0;
+
   try {
     const entries = await readdir(dirPath, { withFileTypes: true });
+
     for (const entry of entries) {
       const fullPath = join(dirPath, entry.name);
+
       if (entry.isDirectory()) {
         total += await getDirSize(fullPath);
       } else {
@@ -56,6 +62,7 @@ async function getDirSize(dirPath: string): Promise<number> {
   } catch {
     // Directory doesn't exist
   }
+
   return total;
 }
 
@@ -66,14 +73,17 @@ async function cleanupExpiredShares(): Promise<void> {
 
   try {
     const buckets = await readdir(uploadsDir);
+
     for (const bucket of buckets) {
       const bucketPath = join(uploadsDir, bucket);
       const shares = await readdir(bucketPath);
 
       for (const shareId of shares) {
         const sharePath = join(bucketPath, shareId);
+
         try {
           const shareStat = await stat(sharePath);
+
           if (now - shareStat.mtimeMs > ttlMs) {
             await rm(sharePath, { recursive: true });
             console.log(`Deleted expired share: ${bucket}/${shareId}`);
@@ -85,6 +95,7 @@ async function cleanupExpiredShares(): Promise<void> {
 
       // Remove empty bucket folders
       const remaining = await readdir(bucketPath);
+
       if (remaining.length === 0) {
         await rm(bucketPath);
       }
@@ -99,12 +110,14 @@ async function serveStatic(pathname: string): Promise<Response> {
   const fullPath = join(DIST_DIR, filePath);
 
   const file = Bun.file(fullPath);
+
   if (await file.exists()) {
     return new Response(file);
   }
 
   // SPA fallback
   const indexFile = Bun.file(join(DIST_DIR, "index.html"));
+
   if (await indexFile.exists()) {
     return new Response(indexFile);
   }
@@ -115,12 +128,14 @@ async function serveStatic(pathname: string): Promise<Response> {
 async function handleDownload(pathname: string): Promise<Response> {
   // /d/:bucket/:shareId
   const parts = pathname.split("/").filter(Boolean);
+
   if (parts.length < 3) {
     return new Response("Invalid path", { status: 400 });
   }
 
   const bucket = parts[1];
   const shareId = parts[2];
+
   if (!(bucket && shareId)) {
     return new Response("Invalid path", { status: 400 });
   }
@@ -131,6 +146,7 @@ async function handleDownload(pathname: string): Promise<Response> {
   try {
     const allFiles = await readdir(shareDir);
     const files = allFiles.filter((f) => f !== ".burn");
+
     if (files.length === 0) {
       return new Response("Not Found", { status: 404 });
     }
@@ -153,9 +169,11 @@ async function handleDownload(pathname: string): Promise<Response> {
     } else {
       // Multiple files - serve as zip
       const archive = new ZipArchive({ zlib: { level: 5 } });
+
       for (const filename of files) {
         archive.file(join(shareDir, filename), { name: filename });
       }
+
       // Not awaited: the archive only drains once the Response consumes it
       archive.finalize().catch((err: unknown) => {
         console.error(`Failed to build zip for share ${shareId}:`, err);
@@ -198,6 +216,7 @@ async function handleUpload(req: Request): Promise<Response> {
 
   // Calculate upload size
   let uploadSize = 0;
+
   for (const file of files) {
     if (file instanceof File) {
       uploadSize += file.size;
@@ -212,6 +231,7 @@ async function handleUpload(req: Request): Promise<Response> {
 
   if (currentSize + uploadSize > maxBytes) {
     const availableMb = Math.floor((maxBytes - currentSize) / 1024 / 1024);
+
     return new Response(`Quota exceeded. ${availableMb}MB available.`, {
       status: 413,
     });
@@ -231,28 +251,34 @@ async function handleUpload(req: Request): Promise<Response> {
 
   // Create burn marker if requested
   const burn = formData.get("burn");
+
   if (burn === "true") {
     await Bun.write(join(shareDir, ".burn"), "");
   }
 
   const url = `/d/${bucket}/${shareId}`;
+
   return Response.json({ url });
 }
 
 async function handleQuota(req: Request): Promise<Response> {
   const ip = getClientIp(req);
+
   if (isRateLimited(ip)) {
     return new Response("Too many requests", { status: 429 });
   }
 
   const password = req.headers.get("X-Password");
+
   if (!(password && config.passwords.includes(password))) {
     return new Response("Unauthorized", { status: 401 });
   }
+
   const bucket = hashPassword(password);
   const bucketDir = join(config.data_dir, "uploads", bucket);
   const used = await getDirSize(bucketDir);
   const max = config.max_bucket_size_mb * 1024 * 1024;
+
   return Response.json(
     { used, max, available: max - used },
     { headers: { "Access-Control-Allow-Origin": "*" } },
@@ -297,6 +323,7 @@ const server: ReturnType<typeof Bun.serve> = Bun.serve({
     if (url.pathname === "/api/upload" && req.method === "POST") {
       return handleUpload(req).then((response) => {
         response.headers.set("Access-Control-Allow-Origin", "*");
+
         return response;
       });
     }
@@ -315,6 +342,7 @@ console.log(`Server running at http://localhost:${String(server.port)}`);
 
 // Watch for deploy restart signal
 const restartFlag = join(homedir(), ".restart-requested");
+
 watchFile(restartFlag, { interval: 5000 }, (curr) => {
   if (curr.mtimeMs > 0) {
     console.log("Restart requested, shutting down...");
