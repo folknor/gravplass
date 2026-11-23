@@ -175,11 +175,32 @@ async function handleDownload(pathname: string): Promise<Response> {
       }
 
       // Not awaited: the archive only drains once the Response consumes it
-      archive.finalize().catch((err: unknown) => {
-        console.error(`Failed to build zip for share ${shareId}:`, err);
+      void (async (): Promise<void> => {
+        try {
+          await archive.finalize();
+        } catch (err) {
+          console.error(`Failed to build zip for share ${shareId}:`, err);
+        }
+      })();
+
+      const chunks: AsyncIterator<Uint8Array> = archive[Symbol.asyncIterator]();
+
+      const body = new ReadableStream<Uint8Array>({
+        async pull(controller): Promise<void> {
+          const next = await chunks.next();
+
+          if (next.done) {
+            controller.close();
+          } else {
+            controller.enqueue(next.value);
+          }
+        },
+        async cancel(): Promise<void> {
+          await chunks.return?.();
+        },
       });
 
-      response = new Response(archive as unknown as BodyInit, {
+      response = new Response(body, {
         headers: {
           "Content-Disposition": `attachment; filename="${shareId}.zip"`,
           "Content-Type": "application/zip",
@@ -285,17 +306,21 @@ async function handleQuota(req: Request): Promise<Response> {
   );
 }
 
+async function runCleanup(label: string): Promise<void> {
+  try {
+    await cleanupExpiredShares();
+  } catch (err) {
+    console.error(`${label}:`, err);
+  }
+}
+
 // Start cleanup timer (runs every hour)
 setInterval(() => {
-  cleanupExpiredShares().catch((err: unknown) => {
-    console.error("Cleanup error:", err);
-  });
+  void runCleanup("Cleanup error");
 }, HOUR_MS);
 
 // Run cleanup on startup
-cleanupExpiredShares().catch((err: unknown) => {
-  console.error("Initial cleanup error:", err);
-});
+void runCleanup("Initial cleanup error");
 
 const server: ReturnType<typeof Bun.serve> = Bun.serve({
   port: config.port,

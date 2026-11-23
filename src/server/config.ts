@@ -1,6 +1,7 @@
 import { readFileSync, watch } from "node:fs";
 import process from "node:process";
 import { parse } from "toml";
+import * as v from "valibot";
 
 interface Config {
   port: number;
@@ -13,10 +14,17 @@ interface Config {
 
 const configPath: string = process.env["CONFIG_PATH"] ?? "./config.toml";
 
-function loadConfig(): Config {
-  const content = readFileSync(configPath, "utf-8");
+const ConfigSchema = v.object({
+  port: v.number(),
+  data_dir: v.string(),
+  passwords: v.array(v.string()),
+  max_file_size_mb: v.number(),
+  share_ttl_days: v.number(),
+  max_bucket_size_mb: v.number(),
+});
 
-  return parse(content) as Config;
+function loadConfig(): Config {
+  return v.parse(ConfigSchema, parse(readFileSync(configPath, "utf-8")));
 }
 
 export let config: Config = loadConfig();

@@ -3,9 +3,14 @@ import { readdir, stat } from "node:fs/promises";
 import { join } from "node:path";
 import process from "node:process";
 import { parse } from "toml";
+import * as v from "valibot";
 
 const configPath: string = process.env["CONFIG_PATH"] ?? "./config.toml";
-const config = parse(readFileSync(configPath, "utf-8")) as { data_dir: string };
+
+const config = v.parse(
+  v.object({ data_dir: v.string() }),
+  parse(readFileSync(configPath, "utf-8")),
+);
 
 async function getDirSize(dirPath: string): Promise<number> {
   let total = 0;

@@ -17,6 +17,7 @@ import {
 import { Dropzone } from "@mantine/dropzone";
 import type { ChangeEvent, ReactElement } from "react";
 import { useCallback, useEffect, useState } from "react";
+import * as v from "valibot";
 import { IconCheck, IconCopy, IconFile, IconLink, IconTrash, IconUpload, IconX } from "./icons";
 
 interface UploadResult {
@@ -34,6 +35,8 @@ function formatBytes(bytes: number): string {
 
   return `${(bytes / k ** i).toFixed(1)} ${size}`;
 }
+
+const UploadResponseSchema = v.object({ url: v.string() });
 
 function uploadFiles(
   files: File[],
@@ -61,7 +64,13 @@ function uploadFiles(
 
     xhr.addEventListener("load", () => {
       if (xhr.status === 200) {
-        resolve(JSON.parse(xhr.responseText) as { url: string });
+        const result = v.safeParse(UploadResponseSchema, JSON.parse(xhr.responseText));
+
+        if (result.success) {
+          resolve(result.output);
+        } else {
+          reject(new Error("Ugyldig svar fra serveren"));
+        }
       } else if (xhr.status === 401) {
         reject(new Error("Ugyldig passord"));
       } else {
@@ -79,10 +88,30 @@ function uploadFiles(
   });
 }
 
-interface Quota {
-  used: number;
-  max: number;
-  available: number;
+const QuotaSchema = v.object({
+  used: v.number(),
+  max: v.number(),
+  available: v.number(),
+});
+
+type Quota = v.InferOutput<typeof QuotaSchema>;
+
+async function fetchQuota(
+  password: string,
+  signal: AbortSignal | null = null,
+): Promise<Quota | null> {
+  const res = await fetch("/api/quota", {
+    headers: { "X-Password": password },
+    signal,
+  });
+
+  if (!res.ok) {
+    return null;
+  }
+
+  const result = v.safeParse(QuotaSchema, await res.json());
+
+  return result.success ? result.output : null;
 }
 
 export default function App(): ReactElement {
@@ -93,45 +122,25 @@ export default function App(): ReactElement {
   const [progress, setProgress] = useState({ loaded: 0, total: 0 });
   const [results, setResults] = useState<UploadResult[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [quota, setQuota] = useState<Quota | null>(null);
-  const [quotaRefresh, setQuotaRefresh] = useState(0);
+  const [fetchedQuota, setQuota] = useState<Quota | null>(null);
 
+  // An empty password never has a quota, regardless of what was last fetched
+  const quota = password ? fetchedQuota : null;
   const totalSize = queuedFiles.reduce((sum, f) => sum + f.size, 0);
   const exceedsQuota = quota !== null && totalSize > quota.available;
 
-  // Fetch quota when password changes or after upload (debounced)
+  // Fetch quota when password changes (debounced)
   useEffect(() => {
     if (!password) {
-      setQuota(null);
-
       return;
     }
-
-    // quotaRefresh is used to trigger refetch after upload
-    void quotaRefresh;
 
     const controller = new AbortController();
 
     // Debounce: wait 500ms after user stops typing
     const timeoutId = setTimeout(() => {
-      fetch("/api/quota", {
-        headers: { "X-Password": password },
-        signal: controller.signal,
-      })
-        .then((res) => {
-          if (res.ok) {
-            return res.json() as Promise<Quota>;
-          }
-
-          setQuota(null);
-
-          return null;
-        })
-        .then((data) => {
-          if (data) {
-            setQuota(data);
-          }
-        })
+      fetchQuota(password, controller.signal)
+        .then(setQuota)
         .catch(() => {
           // Ignore abort errors
         });
@@ -141,7 +150,7 @@ export default function App(): ReactElement {
       clearTimeout(timeoutId);
       controller.abort();
     };
-  }, [password, quotaRefresh]);
+  }, [password]);
 
   const handleDrop = useCallback((files: File[]): void => {
     setQueuedFiles((prev) => [...prev, ...files]);
@@ -200,7 +209,11 @@ export default function App(): ReactElement {
       ]);
       setQueuedFiles([]);
       setBurn(false);
-      setQuotaRefresh((n) => n + 1);
+      fetchQuota(password)
+        .then(setQuota)
+        .catch(() => {
+          // Keep the previous quota if the refresh fails
+        });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Opplasting feilet");
     } finally {
